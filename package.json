@@ -13,10 +13,12 @@
     "d3-interpolate": "^3.0.1",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.2",
+    "mqtt": "^4.3.7",
     "next": "13.1.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-liquid-gauge": "^1.2.4",
+    "socket.io": "^4.5.4",
     "socket.io-client": "^4.5.4"
   },
   "devDependencies": {

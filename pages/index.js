@@ -1,17 +1,57 @@
 import { io } from "socket.io-client";
 import { color } from "d3-color";
 import { interpolateRgb } from "d3-interpolate";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import LiquidFillGauge from "react-liquid-gauge";
 
-const socket = io("ws://localhost:8000");
+let socket;
 
 export default function Home() {
   const [level, setLevel] = useState(0);
-  const [isConnected, setIsConnected] = useState();
+  const [isConnected, setIsConnected] = useState(false);
+  const [width, setWidth] = useState(100);
+
+  const fullPage = useRef();
 
   let startColor = "#6495ed"; // cornflowerblue
   let endColor = "#dc143c";
+
+  useLayoutEffect(() => {
+    setWidth(() => {
+      if (fullPage.current.clientWidth > 600) {
+        return fullPage.current.clientWidth / 2;
+      } else {
+        return fullPage.current.clientWidth;
+      }
+    });
+    console.log(fullPage.current.clientWidth);
+  });
+
+  useEffect(() => {
+    (async () => {
+      await fetch("/api/socket");
+      socket = io();
+
+      socket.on("connect", () => {
+        console.log("Connected!");
+        setIsConnected(true);
+      });
+
+      socket.on("disconnect", () => {
+        setIsConnected(false);
+      });
+
+      socket.on("level", ({ data }) => {
+        setLevel(() => data);
+      });
+    })();
+
+    // return () => {
+    //   socket.off("connect");
+    //   socket.off("disconnect");
+    //   socket.off("level");
+    // };
+  }, []);
 
   const interpolate = interpolateRgb(startColor, endColor);
   const fillColor = interpolate(level / 100);
@@ -37,57 +77,32 @@ export default function Home() {
     },
   ];
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected!");
-      setIsConnected(true);
-    });
-
-    socket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-
-    socket.on("level", ({ data }) => {
-      setLevel(() => data);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("level");
-    };
-  }, []);
-
-  useEffect(() => {
-    setIsConnected(socket.connected);
-  }, [socket.connected]);
-
   const sendPumpSignal = () => {
-    if (!socket.connected) {
+    if (!isConnected) {
       alert("System offline");
       return;
     }
-    socket.emit("start-pump", true, (val) => {
-      console.log(val);
-    });
+    // socket.emit("start-pump", true, (val) => {
+    //   console.log(val);
+    // });
     alert("Pump started");
   };
 
   const sendTapSignal = () => {
-    if (!socket.connected) {
+    if (!isConnected) {
       alert("System offline");
       return;
     }
-    socket.emit("open-tap", true, (val) => {
-      console.log(val);
-    });
+    // socket.emit("open-tap", true, (val) => {
+    //   console.log(val);
+    // });
     alert("Tap opened");
   };
 
   // client-side
 
   return (
-    <div className="p-8 space-y-4">
+    <div className="p-8 space-y-4 w-full" ref={fullPage}>
       <h1 className="text-[2rem] font-bold ">WaterTank Level</h1>
       <p className="font-semibold text-gray-500">
         System status{"  "}
@@ -103,7 +118,7 @@ export default function Home() {
       </p>
 
       <LiquidFillGauge
-        width={300}
+        width={width - 64}
         height={400}
         value={level}
         percent="%"
