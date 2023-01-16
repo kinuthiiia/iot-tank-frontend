@@ -7,7 +7,7 @@ import LiquidFillGauge from "react-liquid-gauge";
 let socket;
 
 export default function Home() {
-  const [level, setLevel] = useState(0);
+  const [level, setLevel] = useState(25);
   const [isConnected, setIsConnected] = useState(false);
   const [width, setWidth] = useState(400);
 
