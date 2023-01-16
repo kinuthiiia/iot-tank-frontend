@@ -9,7 +9,7 @@ let socket;
 export default function Home() {
   const [level, setLevel] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
-  const [width, setWidth] = useState(100);
+  const [width, setWidth] = useState(400);
 
   const fullPage = useRef();
 
@@ -25,7 +25,7 @@ export default function Home() {
       }
     });
     console.log(fullPage.current.clientWidth);
-  });
+  }, [fullPage.current.clientWidth]);
 
   useEffect(() => {
     (async () => {
@@ -45,12 +45,6 @@ export default function Home() {
         setLevel(() => data);
       });
     })();
-
-    // return () => {
-    //   socket.off("connect");
-    //   socket.off("disconnect");
-    //   socket.off("level");
-    // };
   }, []);
 
   const interpolate = interpolateRgb(startColor, endColor);
