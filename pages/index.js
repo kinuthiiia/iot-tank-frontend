@@ -11,6 +11,8 @@ export default function Home() {
   const [isConnected, setIsConnected] = useState(false);
   const [width, setWidth] = useState(400);
 
+  const [status, setStatus] = useState("rising");
+
   const fullPage = useRef();
 
   let startColor = "#6495ed"; // cornflowerblue
@@ -18,33 +20,47 @@ export default function Home() {
 
   useLayoutEffect(() => {
     setWidth(() => {
-      if (fullPage.current.clientWidth > 600) {
-        return fullPage.current.clientWidth / 2;
+      if (fullPage?.current?.clientWidth > 600) {
+        return fullPage?.current?.clientWidth / 2;
       } else {
-        return fullPage.current.clientWidth;
+        return fullPage?.current?.clientWidth;
       }
     });
-    console.log(fullPage.current.clientWidth);
-  }, [fullPage.current.clientWidth]);
+    console.log(fullPage?.current?.clientWidth);
+  }, []);
 
+  // With ultrasonic sensor configured
+
+  // useEffect(() => {
+  //   (async () => {
+  //     await fetch("/api/socket");
+  //     socket = io();
+
+  //     socket.on("connect", () => {
+  //       console.log("Connected!");
+  //       setIsConnected(true);
+  //     });
+
+  //     socket.on("disconnect", () => {
+  //       setIsConnected(false);
+  //     });
+
+  //     socket.on("level", ({ data }) => {
+  //       setLevel(() => data);
+  //     });
+  //   })();
+  // }, []);
+
+  // Without ultrasonic sensor
   useEffect(() => {
-    (async () => {
-      await fetch("/api/socket");
-      socket = io();
+    setIsConnected(true);
+    const myInterval = setInterval(() => {
+      while (level < 100) {
+        setLevel((prevLevel) => prevLevel + 5);
+      }
+    }, 5000);
 
-      socket.on("connect", () => {
-        console.log("Connected!");
-        setIsConnected(true);
-      });
-
-      socket.on("disconnect", () => {
-        setIsConnected(false);
-      });
-
-      socket.on("level", ({ data }) => {
-        setLevel(() => data);
-      });
-    })();
+    return () => clearInterval(myInterval);
   }, []);
 
   const interpolate = interpolateRgb(startColor, endColor);
