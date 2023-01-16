@@ -29,38 +29,24 @@ export default function Home() {
     console.log(fullPage?.current?.clientWidth);
   }, []);
 
-  // With ultrasonic sensor configured
-
-  // useEffect(() => {
-  //   (async () => {
-  //     await fetch("/api/socket");
-  //     socket = io();
-
-  //     socket.on("connect", () => {
-  //       console.log("Connected!");
-  //       setIsConnected(true);
-  //     });
-
-  //     socket.on("disconnect", () => {
-  //       setIsConnected(false);
-  //     });
-
-  //     socket.on("level", ({ data }) => {
-  //       setLevel(() => data);
-  //     });
-  //   })();
-  // }, []);
-
-  // Without ultrasonic sensor
   useEffect(() => {
-    setIsConnected(true);
-    const myInterval = setInterval(() => {
-      while (level < 100) {
-        setLevel((prevLevel) => prevLevel + 5);
-      }
-    }, 5000);
+    (async () => {
+      await fetch("/api/socket");
+      socket = io();
 
-    return () => clearInterval(myInterval);
+      socket.on("connect", () => {
+        console.log("Connected!");
+        setIsConnected(true);
+      });
+
+      socket.on("disconnect", () => {
+        setIsConnected(false);
+      });
+
+      socket.on("level", ({ data }) => {
+        setLevel(() => data);
+      });
+    })();
   }, []);
 
   const interpolate = interpolateRgb(startColor, endColor);
