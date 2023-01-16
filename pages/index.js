@@ -30,6 +30,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // Activate socket server
     (async () => {
       await fetch("/api/socket");
       socket = io();
