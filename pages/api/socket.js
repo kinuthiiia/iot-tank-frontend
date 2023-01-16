@@ -40,13 +40,6 @@ export default function handler(req, res) {
       }
     });
 
-    // Mock streams
-    setInterval(() => {
-      socket.emit(topic, {
-        data: Math.random() * 100,
-      });
-    }, 5000);
-
     // Receiving data from device
     client.on("message", function (topic, message) {
       console.log("Message : " + message);
